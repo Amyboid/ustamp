@@ -1,0 +1,33 @@
+{
+    "manifest_version": 3,
+    "version": "1.0",
+    "name": "Test",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "test1234"
+        }
+    },
+    "action": {
+        "default_icon": {
+            "16": "icon_loading.png"
+        },
+        "default_title": "ustamp"
+    },
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.youtube.com/*"
+            ],
+            "js": [
+                "main.js"
+            ]
+        }
+    ]
+}
