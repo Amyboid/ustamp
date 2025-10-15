@@ -8,11 +8,24 @@ chrome.action.onClicked.addListener((tab) => {
 });
 
 
-chrome.webNavigation.onHistoryStateUpdated.addListener((details)=>{
+chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
+  console.log('history state updated');
   if (details.url.includes('https://www.youtube.com/watch?')) {
     chrome.scripting.executeScript({
-      target: {tabId: details.tabId},
+      target: { tabId: details.tabId },
       files: ['updatePlayback.js']
     })
+  }
+})
+
+
+chrome.webNavigation.onCommitted.addListener((details) => {
+  if (details.url.includes('https://www.youtube.com/watch?')) {
+    if (details.transitionType === 'reload') {
+      chrome.scripting.executeScript({
+        target: { tabId: details.tabId },
+        files: ['updatePlayback.js']
+      })
+    }
   }
 })

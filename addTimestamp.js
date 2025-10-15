@@ -5,11 +5,9 @@ if (!videoContainer) {
     videoId = videoContainer.baseURI.split('=')[1]
 }
 
-console.log('videoId',videoId);
 
 // update or set new timestamp of a video
 chrome.storage.local.set({[videoId]: video.currentTime}).then(() => {
   console.log("Value is set");
+  console.log('videoId',videoId, video.currentTime);
 });
-
-
