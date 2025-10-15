@@ -1,10 +1,10 @@
 {
     "manifest_version": 3,
     "version": "1.0",
-    "name": "Test",
+    "name": "Ustamp",
     "browser_specific_settings": {
         "gecko": {
-            "id": "test1234"
+            "id": "U1234"
         }
     },
     "action": {
@@ -13,9 +13,16 @@
         },
         "default_title": "ustamp"
     },
+    "host_permissions": [
+        "https://www.youtube.com/*"
+    ],
+
     "permissions": [
         "activeTab",
-        "scripting"
+        "scripting",
+        "storage",
+        "webNavigation",
+        "tabs"
     ],
     "background": {
         "service_worker": "background.js"
@@ -23,11 +30,12 @@
     "content_scripts": [
         {
             "matches": [
-                "https://www.youtube.com/*"
+                "https://www.youtube.com/watch?*"
             ],
             "js": [
-                "main.js"
-            ]
+                "init.js"
+            ],
+            "type": "module"
         }
     ]
 }
