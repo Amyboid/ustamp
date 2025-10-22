@@ -22,6 +22,8 @@ chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
 chrome.webNavigation.onCommitted.addListener((details) => {
   if (details.url.includes('https://www.youtube.com/watch?')) {
     if (details.transitionType === 'reload') {
+      console.log('reloaded');
+      
       chrome.scripting.executeScript({
         target: { tabId: details.tabId },
         files: ['updatePlayback.js']

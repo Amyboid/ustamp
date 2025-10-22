@@ -3,24 +3,24 @@ video = document.getElementsByClassName('video-stream')[0]
 videoId = videoContainer.baseURI.split('=')[1]
 
 // get the video from storage 
-chrome.storage.local.get([videoId]).then((result)=>{
+chrome.storage.local.get([videoId]).then((result) => {
     if (result) {
-        console.log('result:', result);
+        console.log('result:', result, videoId);
         let currentTimestamp = result[videoId]
-        // check if the video already exist
-        if (currentTimestamp) {   
-            console.log('previous timestamp: ', currentTimestamp, video.currentTime);
-
+        console.log('currentTime:::', currentTimestamp);
+        // check if the video exist
+        if (currentTimestamp) {
+            // if video is already loaded
+            if (video.duration) {
+                console.log('video duration', video.duration);
+                video.currentTime = parseFloat(currentTimestamp) - 10
+            }
             // wait for loading the video meta data
             video.addEventListener('loadedmetadata', () => {
+                console.log('Metadata loaded');
                 // update it's currentTime
-                video.currentTime = parseFloat(currentTimestamp)
-                console.log('currentTime after set: ', video.currentTime);
+                video.currentTime = parseFloat(currentTimestamp) - 10
             })
         }
     }
-})
-
-chrome.storage.local.get(null).then((result)=>{
-    console.log('vcAll:',result);
 })
