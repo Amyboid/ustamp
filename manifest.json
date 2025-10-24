@@ -9,9 +9,10 @@
     },
     "action": {
         "default_icon": {
-            "16": "icon_loading.png"
+            "16": "icons/icon.png"
         },
-        "default_title": "ustamp"
+        "default_title": "ustamp",
+        "default_popup": "popup.html"
     },
     "host_permissions": [
         "https://www.youtube.com/*"
@@ -30,12 +31,11 @@
     "content_scripts": [
         {
             "matches": [
-                "https://www.youtube.com/watch?*"
+                "https://www.youtube.com/*"
             ],
             "js": [
-                "init.js"
-            ],
-            "type": "module"
+                "content_script.js"
+            ]
         }
     ]
 }

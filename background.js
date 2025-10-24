@@ -1,17 +1,8 @@
-chrome.action.onClicked.addListener((tab) => {
-  if (tab.url.includes('https://www.youtube.com/watch?')) {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ['addTimestamp.js']
-    })
-  }
-});
-
-function sendAutoCaptureMsg() {
+function sendAutoCaptureMsg(tabId) {
   chrome.storage.sync.get(['autoCapture'], (result) => {
     console.log('autCap', result.autoCapture);
     if (result.autoCapture) {
-      chrome.tabs.sendMessage(details.tabId, { autoCapture: "start" })
+      chrome.tabs.sendMessage(tabId, { autoCapture: "start" })
     }
   })
 }
@@ -24,7 +15,7 @@ chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
       target: { tabId: details.tabId },
       files: ['updatePlayback.js']
     })
-    sendAutoCaptureMsg()
+    sendAutoCaptureMsg(details.tabId)
   }
 })
 
@@ -37,7 +28,7 @@ chrome.webNavigation.onCommitted.addListener((details) => {
         target: { tabId: details.tabId },
         files: ['updatePlayback.js']
       })
-      sendAutoCaptureMsg()
+      sendAutoCaptureMsg(details.tabId)
     }
   }
 })

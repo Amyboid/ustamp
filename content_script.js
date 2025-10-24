@@ -12,7 +12,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     videoContainer = document.getElementById('movie_player')
     video = document.getElementsByClassName('video-stream')[0]
     videoId = videoContainer.baseURI.split('&')[0]
-    
+
     // checking for add timestamp instruction
     if (message.addTimestamp) {
         // update or set new timestamp of a video
@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
     }
     // checking for auto capture instruction
-    else if (message.autoCapture) {
+    if (message.autoCapture) {
         if (message.autoCapture === 'start') {
             sendResponse({ capturing: true })
             autoCapture()
@@ -32,17 +32,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             intervalId = undefined
         }
     }
+
+    if (message.sendTitle) {
+        const url = window.location.href;
+        if (url && url.includes('https://www.youtube.com/watch?')) {
+            // classname used here is temporary, it can be changed in future
+            let titleElement = document.getElementsByClassName('ytd-watch-metadata')[4]
+            if (titleElement) {
+                console.log(titleElement.innerHTML, titleElement.innerText);
+                
+                sendResponse({title: titleElement.innerText})
+            }
+            else{
+                sendResponse({error: 'No title found'})
+            }
+        }
+    }
     return true;
 })
 
 function autoCapture() {
     intervalId ??= setInterval(() => {
         const url = window.location.href;
-        console.log('URL: ', url);
         if (url && url.includes('https://www.youtube.com/watch?')) {
             chrome.storage.local.set({ [videoId]: video.currentTime }).then(() => {
-            console.log('captured');
-        });
+                console.log('captured');
+            });
         }
         else {
             clearInterval(intervalId)

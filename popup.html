@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="current-playback">
+      <h1>Currently playing</h1>
+      <div class="playing-status">
+        <img src="assets/playing.png" class="playing-icon" alt="playing-icon" />
+        <p id="video-title"></p>
+      </div>
+    </div>
+    <div class="actions-div">
+      <div class="capture-div">
+        <p>Capture</p>
+        <button id="capture-btn" aria-label="capture">
+          <img src="assets/capture.png" alt="" srcset="" />
+        </button>
+      </div>
+
+      <div class="auto-capture-div">
+        <p>Auto capture</p>
+        <label class="switch">
+          <input type="checkbox" id="auto-capture" />
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+    <div id="timestamps" class="timestamps-div">
+    </div>
+    <script src="modifyTimestamp.js"></script>
+  </body>
+</html>
