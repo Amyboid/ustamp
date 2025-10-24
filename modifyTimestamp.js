@@ -47,12 +47,12 @@ function createTimestamp(container, keyText, valueText) {
     const timestampLeftDiv = document.createElement('div');
     timestampLeftDiv.className = 'timestamp-left';
 
-    // Create the timestamp-key div
+    // Create the timestamp-key span
     const timestampKeySpan = document.createElement('span');
     timestampKeySpan.className = 'timestamp-key';
     timestampKeySpan.textContent = keyText; // Set the key text
 
-    // Create the timestamp-value div
+    // Create the timestamp-value span
     const timestampValueSpan = document.createElement('span');
     timestampValueSpan.className = 'timestamp-value';
     timestampValueSpan.textContent = valueText; // Set the value text
@@ -65,7 +65,7 @@ function createTimestamp(container, keyText, valueText) {
     const deleteButton = document.createElement('button');
     deleteButton.className = 'timestamp-delete-btn';
     deleteButton.setAttribute('aria-label', 'delete-timestamp');
-
+    deleteButton.addEventListener('click', () => deleteTimestamp(keyText))
     // Create the image for the delete button
     const deleteImage = document.createElement('img');
     deleteImage.src = 'assets/delete.png';
@@ -80,6 +80,14 @@ function createTimestamp(container, keyText, valueText) {
 
     // Append the timestamp element to your desired parent in the DOM
     container.appendChild(timestampDiv);
+}
+function deleteTimestamp(key) {
+    chrome.storage.local.remove([key], () => {
+        let error = chrome.runtime.lastError;
+        if (error) {
+            console.error(error);
+        }
+    })
 }
 function fetchAll(container) {
     chrome.storage.local.get(null).then((result) => {

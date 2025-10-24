@@ -12,6 +12,7 @@ body{
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    background-image: linear-gradient(45deg, #feb0b026 20%,#ffffff19 80%);
 }
 *::-webkit-scrollbar {
   display: none;
@@ -73,6 +74,7 @@ body{
     justify-content: center;
     cursor: pointer;
     border: none;
+    background-color: transparent;
 }
 #capture-btn > img{
     width: 25px;
@@ -185,7 +187,7 @@ input:disabled + .slider:before {
     height: 20px;
 }
 .timestamp-key, .timestamp-value{
-    font-size: 1.1rem;
+    font-size: 1rem;
     text-align: center;
     padding: 10px 5px;
 }
