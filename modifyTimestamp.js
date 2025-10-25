@@ -1,8 +1,13 @@
+let timestampsContainer;
+let allTimestamps = []
+
 document.addEventListener('DOMContentLoaded', () => {
+     // Setting a flag when the popup is opened
+    chrome.storage.sync.set({ isPopupOpen: true });
     let currentPlayback = document.getElementById('current-playback')
     let captureButton = document.getElementById('capture-btn')
     let videoTitle = document.getElementById('video-title')
-    let timestampsContainer = document.getElementById('timestamps')
+    timestampsContainer = document.getElementById('timestamps')
     setTitle(videoTitle, currentPlayback)
     captureButton.addEventListener('click', () => addTimestamp())
 
@@ -27,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 
-    fetchAll(timestampsContainer)
+    fetchAll()
 });
 
 function formatTime(totalSeconds) {
@@ -65,7 +70,6 @@ function createTimestamp(container, keyText, valueText) {
     const deleteButton = document.createElement('button');
     deleteButton.className = 'timestamp-delete-btn';
     deleteButton.setAttribute('aria-label', 'delete-timestamp');
-    deleteButton.addEventListener('click', () => deleteTimestamp(keyText))
     // Create the image for the delete button
     const deleteImage = document.createElement('img');
     deleteImage.src = 'assets/delete.png';
@@ -73,6 +77,7 @@ function createTimestamp(container, keyText, valueText) {
 
     // Append the image to the delete button
     deleteButton.appendChild(deleteImage);
+    deleteButton.addEventListener('click', () => deleteTimestamp(keyText))
 
     // Append the left div and delete button to the main timestamp div
     timestampDiv.appendChild(timestampLeftDiv);
@@ -80,6 +85,7 @@ function createTimestamp(container, keyText, valueText) {
 
     // Append the timestamp element to your desired parent in the DOM
     container.appendChild(timestampDiv);
+
 }
 function deleteTimestamp(key) {
     chrome.storage.local.remove([key], () => {
@@ -87,17 +93,36 @@ function deleteTimestamp(key) {
         if (error) {
             console.error(error);
         }
+        allTimestamps = allTimestamps.filter(ts => ts.key !== key);
+        refreshTimestamps();
     })
 }
-function fetchAll(container) {
+function fetchAll() {
     chrome.storage.local.get(null).then((result) => {
+        allTimestamps = [];
         Object.keys(result).forEach((key) => {
-            result[key] = formatTime(parseFloat(result[key]))
-            createTimestamp(container, key, result[key])
+            const formattedTime = formatTime(parseFloat(result[key]))
+            allTimestamps.push({ key: key, value: formattedTime })
         }
         )
+        refreshTimestamps()
     })
 
+}
+
+function refreshTimestamps() {
+    timestampsContainer.innerHTML = '';
+    // Render all timestamps
+    allTimestamps.forEach(({ key, value }) => {
+        createTimestamp(timestampsContainer, key, value);
+    });
+}
+
+function updateTimestamps(response) {
+    // removing the element if it already exist in the array to get the updated one
+    allTimestamps = allTimestamps.filter(ts => ts.key !== response.key);
+    allTimestamps.push({ key: response.key, value: formatTime(response.value) });
+    refreshTimestamps();
 }
 
 function addTimestamp() {
@@ -105,7 +130,7 @@ function addTimestamp() {
         if (tabs[0].url.includes('https://www.youtube.com/watch?')) {
             chrome.tabs.sendMessage(tabs[0].id, { addTimestamp: true }, (response) => {
                 if (response) {
-                    // alert(response.status);
+                    updateTimestamps(response)
                 }
                 else {
                     alert("No response from content script.");
@@ -117,6 +142,13 @@ function addTimestamp() {
         }
     })
 }
+// listening for message send by content-script to update timestamp in extension ui
+chrome.runtime.onMessage.addListener((msg, _, sendResponse) => {
+    if (msg && msg.key && msg.value) {
+        updateTimestamps(msg)
+        sendResponse({ timestampUpdated: true })
+    }
+});
 
 function sendAutoCaptureMsg(isChecked) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -153,3 +185,11 @@ function setTitle(videoTitle, currentPlayback) {
         }
     })
 }
+
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        // Clear the flag when the popup is closed
+        chrome.storage.sync.set({ isPopupOpen: false });
+    }
+})

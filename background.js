@@ -1,6 +1,5 @@
 function sendAutoCaptureMsg(tabId) {
   chrome.storage.sync.get(['autoCapture'], (result) => {
-    console.log('autCap', result.autoCapture);
     if (result.autoCapture) {
       chrome.tabs.sendMessage(tabId, { autoCapture: "start" })
     }
