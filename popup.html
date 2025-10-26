@@ -16,9 +16,9 @@
     </div>
     <div class="actions-div">
       <div class="capture-div">
-        <p>Capture</p>
+        <p id="capturing-status"></p>
         <button id="capture-btn" aria-label="capture">
-          <img src="assets/capture.png" alt="" srcset="" />
+          <img id="capturing-status-img" alt="" srcset="" />
         </button>
       </div>
 
@@ -31,6 +31,14 @@
       </div>
     </div>
     <div id="timestamps" class="timestamps-div">
+      <div class="description-div">
+        <img src="assets/description.png" alt="" srcset="" />
+        <p>
+          Watch a youtube video and capture the last played time, to begin where
+          you left off. Toggle <span class="description-highlight">Auto capture</span> to capture time
+          autumatically at 15s interval.
+        </p>
+      </div>
     </div>
     <script src="modifyTimestamp.js"></script>
   </body>

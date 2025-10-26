@@ -1,12 +1,21 @@
 let timestampsContainer;
+let capturingStatus;
+let capturingStatusImg;
+let currentPlayback;
+let captureButton;
+let videoTitle;
 let allTimestamps = []
 
 document.addEventListener('DOMContentLoaded', () => {
-     // Setting a flag when the popup is opened
+    // Setting a flag when the popup is opened
     chrome.storage.sync.set({ isPopupOpen: true });
-    let currentPlayback = document.getElementById('current-playback')
-    let captureButton = document.getElementById('capture-btn')
-    let videoTitle = document.getElementById('video-title')
+
+    currentPlayback = document.getElementById('current-playback')
+    captureButton = document.getElementById('capture-btn')
+    videoTitle = document.getElementById('video-title')
+    capturingStatus = document.getElementById('capturing-status')
+    capturingStatusImg = document.getElementById('capturing-status-img')
+
     timestampsContainer = document.getElementById('timestamps')
     setTitle(videoTitle, currentPlayback)
     captureButton.addEventListener('click', () => addTimestamp())
@@ -21,19 +30,65 @@ document.addEventListener('DOMContentLoaded', () => {
     // getting autocapture setting from storage
     chrome.storage.sync.get(['autoCapture'], (result) => {
         autoCaptureToggle.checked = result.autoCapture || false;
+        if (autoCaptureToggle.checked) {
+            setCapturingStatus(true)
+        }
+        else {
+             setCapturingStatus(false)
+        }
     });
     autoCaptureToggle.addEventListener('change', () => {
         chrome.storage.sync.set({ autoCapture: autoCaptureToggle.checked })
         let isChecked = autoCaptureToggle.checked
         if (isChecked) {
+            setCapturingStatus(true)
             sendAutoCaptureMsg(isChecked)
         } else {
+            setCapturingStatus(false)
             sendAutoCaptureMsg(isChecked)
         }
     })
 
-    fetchAll()
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0].url.includes('https://www.youtube.com/watch?')) {
+            fetchAll()
+        } else {
+            showDescription(timestampsContainer)
+        }
+    })
 });
+function setCapturingStatus(capturing) {
+    if (capturing) {
+        capturingStatus.innerText = 'Capturing'
+        capturingStatusImg.src = 'assets/capturing.png'
+        captureButton.disabled = true
+    } else {
+        capturingStatus.innerText = 'Capture'
+        capturingStatusImg.src = 'assets/capture.png'
+        captureButton.disabled = false
+    }
+}
+
+function showDescription() {
+    const descriptionDiv = document.createElement('div');
+    descriptionDiv.className = 'description-div';
+
+    const img = document.createElement('img');
+    img.src = 'assets/description.png';
+    img.alt = '';
+
+    const paragraph = document.createElement('p');
+    paragraph.innerHTML = `
+  Watch a youtube video and capture the last played time, to begin where
+  you left off. Toggle <span class="description-highlight">Auto capture</span> to capture time
+  automatically at 15s interval.
+`;
+
+    descriptionDiv.appendChild(img);
+    descriptionDiv.appendChild(paragraph);
+
+    timestampsContainer.body.appendChild(descriptionDiv);
+}
 
 function formatTime(totalSeconds) {
     let hours = Math.floor(totalSeconds / 3600);
@@ -138,7 +193,7 @@ function addTimestamp() {
             })
         }
         else {
-            alert('please watch a video to add timestamp', tabs[0].url)
+            alert('please watch a video to capture', tabs[0].url)
         }
     })
 }

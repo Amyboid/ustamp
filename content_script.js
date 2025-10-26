@@ -7,8 +7,7 @@ chrome.storage.local.get(null).then((result) => {
 })
 
 let intervalId;
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log('message: ', sender, message);
+chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     videoContainer = document.getElementById('movie_player')
     video = document.getElementsByClassName('video-stream')[0]
     videoId = videoContainer.baseURI.split('&')[0]
@@ -59,6 +58,7 @@ function autoCapture() {
             chrome.storage.local.set({ [videoId]: video.currentTime }).then(() => {
                 console.log('captured');
                 chrome.storage.sync.get(['isPopupOpen'], (result) => {
+                    // send message only if popup window is open
                     if (result.isPopupOpen) {
                         chrome.runtime.sendMessage({ key: videoId, value: video.currentTime });
                     }
@@ -69,6 +69,5 @@ function autoCapture() {
             clearInterval(intervalId)
             intervalId = undefined
         }
-
-    }, 2000)
+    }, 15000)
 }
