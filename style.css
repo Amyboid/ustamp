@@ -68,7 +68,7 @@ body {
 .auto-capture-div > p {
   font-size: 1.2rem;
 }
-#capture-btn {
+#capture-btn, #copy-url-btn {
   padding: 0;
   border-radius: 50%;
   display: flex;
@@ -160,49 +160,71 @@ input:disabled + .slider:before {
   flex-direction: column;
   width: 100%;
   height: 450px;
-  overflow-y: scroll;
+  overflow: scroll;
   scroll-behavior: smooth;
 }
 .timestamp {
   width: 100%;
-  height: 36px;
   display: flex;
 }
 .timestamp-left {
-  width: 94%;
-  height: 100%;
+  width: 85%;
+  height: 75px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.timestamp-delete-btn {
-  width: 6%;
+.timestamp-right {
+  width: 15%;
   display: flex;
-  align-items: center;
+  height: 75px;
+  gap: 10px;
+  align-items: flex-end;
   justify-content: flex-end;
+}
+.timestamp-video-link {
+  position: absolute;
+  opacity: 0;
+}
+
+.timestamp-delete-btn, .copy-url-btn {  
   border: none;
   background: transparent;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
-.timestamp-delete-btn img {
-  width: 20px;
-  height: 20px;
+.timestamp-delete-btn img, .copy-url-icon {
+  width: 25px;
+  height: 25px;  
+
 }
 .timestamp-key,
 .timestamp-value {
   font-size: 1rem;
-  text-align: center;
-  padding: 10px 5px;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .timestamp-key {
   width: 80%;
+  padding: 10px 10px;
   border: 2px dotted #feb0b0;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
+.video-link {
+  text-decoration: none;
+  color: black;
+}
+.video-link:hover {
+  text-decoration: underline;
+}
 .timestamp-value {
-  width: 20%;
+  width: 20%; 
+  padding: 10px 5px;
+  justify-content: center;
   border: 2px dotted #feb0b0;
   border-left: none;
   border-top-right-radius: 5px;
