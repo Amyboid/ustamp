@@ -15,30 +15,26 @@ function sendAutoCaptureMsg() {
 
 function setCurrentTime(video, currentTimestamp) {
     video.currentTime = parseFloat(currentTimestamp) - 10
+    console.log('video c time', video.currentTime);
     sendAutoCaptureMsg()
     return
 }
 
-function generateShortLink(longUrl) {
-    let videoId = longUrl.split('=')[1]
-    let shortLinkTemplate = 'https://youtu.be/'
-    return shortLinkTemplate + videoId
-}
 
 async function runAll(video, videoContainer) {
     await sleep(2000)
-    let videoId = generateShortLink(videoContainer.baseURI.split('&')[0])
+    let videoId = videoContainer.baseURI.split('v=')[1].split('&')[0]
     console.log('vid', videoId);
-    // let showingAd = videoContainer.classList.contains("ad-showing")
-
 
     let observer = new MutationObserver(() => {
         let vc = document.getElementsByTagName('video')[0].parentElement.parentElement
         if (vc.classList.contains("ad-showing")) {
+            // video.currentTime = 10000 // temp for testing should be removed
             console.log('showing ad....');
         }
         else {
             console.log('not showing ad....', videoId);
+            // video.currentTime = 0 // temp for testing should be removed
             observer.disconnect()
             // get the video from storage 
             chrome.storage.local.get([videoId]).then((result) => {

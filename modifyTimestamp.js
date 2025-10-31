@@ -77,10 +77,10 @@ function setCapturingStatus(capturing) {
 function sendAutoCaptureMsg(isChecked) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (isChecked) {
-            chrome.tabs.sendMessage(tabs[0].id, { autoCapture: "start", tabId: tabs[0].id })
+            chrome.tabs.sendMessage(tabs[0].id, { autoCapture: "start", tabId: tabs[0].id, sender: "popup" })
         }
         else {
-            chrome.tabs.sendMessage(tabs[0].id, { autoCapture: "stop", tabId: tabs[0].id })
+            chrome.tabs.sendMessage(tabs[0].id, { autoCapture: "stop", tabId: tabs[0].id, sender: "popup" })
         }
     })
 }
@@ -95,7 +95,7 @@ function formatTime(Seconds) {
 }
 
 function formatUrl(key, time) {
-    return key + '?t=' + parseInt(time)
+    return 'https://youtu.be/' + key + '?t=' + parseInt(time)
 }
 function showDescription() {
     const descriptionDiv = document.createElement('div');
