@@ -7,27 +7,49 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <div id="popup-container">
+    <div class="nav">
+      <div>
+        <img class="logo" src="assets/logo.png" alt="logo" />
+      </div>
+      <div class="nav-right">
+        <div>
+          <img class="git" src="assets/git.png" alt="github-icon" />
+        </div>
+        <div id="settings">
+          <img src="assets/setting.png" alt="settings-icon" />
+          <div id="settings-popup">
+            <div class="auto-toggle-div">
+              <p>Auto update playback</p>
+              <label class="switch">
+                <input type="checkbox" id="auto-update" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="auto-toggle-div">
+              <p>Auto capture</p>
+              <label class="switch">
+                <input type="checkbox" id="auto-capture" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="current-playback">
-      <h1>Currently playing</h1>
+      <div class="actions-div">
+        <p>Currently playing</p>
+        <div class="capture-div">
+          <p id="capturing-status"></p>
+          <button id="capture-btn" aria-label="capture">
+            <img id="capturing-status-img" alt="" srcset="" />
+          </button>
+        </div>
+      </div>
       <div class="playing-status">
         <img src="assets/playing.png" class="playing-icon" alt="playing-icon" />
         <p id="video-title"></p>
-      </div>
-    </div>
-    <div class="actions-div">
-      <div class="capture-div">
-        <p id="capturing-status"></p>
-        <button id="capture-btn" aria-label="capture">
-          <img id="capturing-status-img" alt="" srcset="" />
-        </button>
-      </div>
-
-      <div class="auto-capture-div">
-        <p>Auto capture</p>
-        <label class="switch">
-          <input type="checkbox" id="auto-capture" />
-          <span class="slider round"></span>
-        </label>
       </div>
     </div>
     <div id="timestamps" class="timestamps-div">
@@ -38,21 +60,30 @@
               class="video-link"
               href="https://www.youtube.com/watch?v=WwkuAqObplU"
               >Artificial Intelligence and Machine Learning have revolutionized
-              technology, enabling new innovations daily</a
+              technology, enabling</a
             >
           </span>
-          <span class="timestamp-value">00:12:60</span>
+          <div class="progress-status">
+            <span class="timestamp-value">00:12:60</span>
+            <div class="progress-bar">
+              <div class="progress-completed"></div>
+            </div>
+            <span class="progress-percentage">67%</span>
+          </div>
         </div>
         <div class="timestamp-right">
+          <button class="timestamp-delete-btn" aria-label="delete-timestamp">
+            <img src="assets/delete.png" alt="" />
+          </button>
           <span class="timestamp-video-link">hie, hello</span>
           <button class="copy-url-btn" aria-label="copy-url-btn">
             <img class="copy-url-icon" src="assets/copy.png" alt="" />
           </button>
-          <button class="timestamp-delete-btn" aria-label="delete-timestamp">
-            <img src="assets/delete.png" alt="" />
-          </button>
         </div>
       </div> -->
+    </div>
+    <div id="footer">
+    </div>
     </div>
     <script src="modifyTimestamp.js"></script>
   </body>

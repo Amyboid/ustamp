@@ -37,7 +37,6 @@ chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
     let videoLoaded = videoLodedMap.get("videoLoaded")
     let vidId = details.url.split('v=')[1].split('&')[0]
     let documentId = details.documentId
-    console.log('videoLodedMap onHistUpdate: ', videoLoaded)
     if (videoLoaded) {
       if (videoLoaded.vidId === vidId && videoLoaded.documentId === documentId) {
         return
@@ -66,7 +65,6 @@ chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
 
 chrome.webNavigation.onCommitted.addListener((details) => {
   if (details.url.includes('https://www.youtube.com/watch?')) {
-    console.log('oncommited', details)
     let videoLoaded = videoLodedMap.get("videoLoaded")
     let vidId = details.url.split('v=')[1].split('&')[0]
     let documentId = details.documentId

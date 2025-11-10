@@ -7,6 +7,16 @@
             "id": "U1234"
         }
     },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "fonts/*.ttf"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
     "action": {
         "default_icon": {
             "16": "icons/icon.png"
@@ -17,7 +27,6 @@
     "host_permissions": [
         "https://www.youtube.com/*"
     ],
-
     "permissions": [
         "activeTab",
         "scripting",

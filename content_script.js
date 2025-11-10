@@ -17,8 +17,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.addTimestamp) {
         console.log("video while normal capturing: ", videoContainer.baseURI.split('v=')[1]);
         // update or set new timestamp of a video
-        chrome.storage.local.set({ [videoId]: { "title": title, "time": video.currentTime } }).then(() => {
-            sendResponse({ key: videoId, title: title, time: video.currentTime })
+        chrome.storage.local.set({ [videoId]: { "title": title, "time": video.currentTime, "done": calculatePercentage(video.currentTime, video.duration) } }).then(() => {
+            sendResponse({ key: videoId, title: title, time: video.currentTime, done: calculatePercentage(video.currentTime, video.duration) })
         });
     }
     // checking for auto capture instruction
@@ -48,6 +48,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
 })
 
+function calculatePercentage(currentTime, duration) {
+    let completed = Math.round((Math.ceil(currentTime) / Math.ceil(duration)) * 100)
+    return completed
+}
 // let intervalIds = new Set();
 function autoCapture(videoId, tabId, start) {
     console.log('\n-----\nvideoId passed to autocapture: ', videoId, "\nstart: ", start, "\n-----\n");
@@ -91,7 +95,7 @@ function startInterval(videoId) {
                     if (Object.keys(result).length > 0) {
                         updatedTime = Math.max(updatedTime, result[videoId].time)
                     }
-                    chrome.storage.local.set({ [videoId]: { "title": title, "time": updatedTime } }).then(() => {
+                    chrome.storage.local.set({ [videoId]: { "title": title, "time": updatedTime, "done": calculatePercentage(video.currentTime, video.duration) } }).then(() => {
                         console.log('\n---\ncaptured video info\n', "videoId: ", videoId, "\ntitle: ", title, "\currentTime: ", updatedTime, "intervalId: ", intervalId, "\n----\n");
                     });
                 })
@@ -116,12 +120,8 @@ function setCurrentlyAutoCapturingVideo(tabId, add, intervalId) {
 }
 
 function getTitle() {
-    let titleElement = document.querySelector('head > meta[name="title"]');
     let titleTag = document.querySelector('head > title')
-    if (titleElement) {
-        console.log('from getTitle if cond', titleElement.content);
-        return titleElement.content
-    } else if (titleTag) {
+    if (titleTag) {
         console.log('from else if cond', produceTitle(titleTag.innerText));
         return produceTitle(titleTag.innerText)
     }

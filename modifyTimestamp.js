@@ -1,4 +1,7 @@
 let timestampsContainer;
+let settingsPopup;
+let settingsBtn;
+let footer;
 let capturingStatus;
 let capturingStatusImg;
 let currentPlayback;
@@ -7,28 +10,32 @@ let videoTitle;
 let allTimestamps = []
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Setting a flag when the popup is opened
-    chrome.storage.sync.set({ isPopupOpen: true });
-
     currentPlayback = document.getElementById('current-playback')
     captureButton = document.getElementById('capture-btn')
     videoTitle = document.getElementById('video-title')
     capturingStatus = document.getElementById('capturing-status')
     capturingStatusImg = document.getElementById('capturing-status-img')
-
+    settingsBtn = document.getElementById('settings')
+    settingsPopup = document.getElementById('settings-popup')
+    settingsPopup.style.display = 'none'
+    settingsBtn.addEventListener('click', () => handleSettingsPopup())
     timestampsContainer = document.getElementById('timestamps')
+    footer = document.getElementById('footer')
     setTitle(videoTitle, currentPlayback)
     setCapturingStatus(false)
     captureButton.addEventListener('click', () => addTimestamp())
 
     let autoCaptureToggle = document.getElementById('auto-capture')
+    let autoUptateToggle = document.getElementById('auto-update')
     autoCaptureToggle.disabled = true
+    autoUptateToggle.disabled = true
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0].url.includes('https://www.youtube.com/watch?')) {
             autoCaptureToggle.disabled = false
+            autoUptateToggle.disabled = false
             // getting autocapture setting from storage
             chrome.storage.sync.get(['autoCapture'], (result) => {
-                autoCaptureToggle.checked = result.autoCapture || false;
+                autoCaptureToggle.checked = result.autoCapture ?? false;
                 let isChecked = autoCaptureToggle.checked
                 if (autoCaptureToggle.checked && !autoCaptureToggle.disabled) {
                     setCapturingStatus(true)
@@ -39,6 +46,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     sendAutoCaptureMsg(isChecked)
                 }
             });
+
+            chrome.storage.sync.get(['autoUpdate'], (result) => {
+                autoUptateToggle.checked = result.autoUpdate ?? false;
+            })
+
+            footer.innerHTML = ''
+        } else {
+            footer.innerHTML =
+                `
+      <div class="support">
+        <img src="assets/support.png" alt="" />
+        <span><a href="">Show some support</a></span>
+      </div>
+      <span>|</span>
+      <span><a href="">How to use this extension?</a></span>
+        `
         }
     });
     autoCaptureToggle.addEventListener('change', () => {
@@ -53,8 +76,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 
+    autoUptateToggle.addEventListener('change', () => {
+        chrome.storage.sync.set({ autoUpdate: autoUptateToggle.checked })
+    })
+
     fetchAll()
 });
+
+function handleSettingsPopup(){
+    if (settingsPopup.style.display === 'none') {
+        settingsPopup.style.display = 'flex'
+    }
+    else{
+        settingsPopup.style.display = 'none'
+    }
+}
 function copyUrlToClipBoard(copyIcon, url) {
     navigator.clipboard.writeText(url);
     copyIcon.src = "assets/copied.png"
@@ -97,101 +133,76 @@ function formatTime(Seconds) {
 function formatUrl(key, time) {
     return 'https://youtu.be/' + key + '?t=' + parseInt(time)
 }
-function showDescription() {
-    const descriptionDiv = document.createElement('div');
-    descriptionDiv.className = 'description-div';
-
-    const img = document.createElement('img');
-    img.src = 'assets/description.png';
-    img.alt = '';
-
-    const paragraph = document.createElement('p');
-    paragraph.innerHTML = `
-  Watch a youtube video and capture the last played time, to begin where
-  you left off. Toggle <span class="description-highlight">Auto capture</span> to capture time
-  automatically at 15s interval.
-`;
-
-    descriptionDiv.appendChild(img);
-    descriptionDiv.appendChild(paragraph);
-    timestampsContainer.appendChild(descriptionDiv);
-}
 
 
-function createTimestamp(container, key, title, time) {
-    const timestampDiv = document.createElement('div');
-    timestampDiv.className = 'timestamp';
+function createTimestamp(container, key, title, time, done) {
+    const timestamp = document.createElement("div");
+    timestamp.className = "timestamp";
 
-    // Create the timestamp-left div
-    const timestampLeftDiv = document.createElement('div');
-    timestampLeftDiv.className = 'timestamp-left';
+    const left = document.createElement("div");
+    left.className = "timestamp-left";
 
-    // Create the timestamp-key span
-    const timestampKeySpan = document.createElement('span');
-    timestampKeySpan.className = 'timestamp-key';
+    const spanKey = document.createElement("span");
+    spanKey.className = "timestamp-key";
 
-    const timestampVideoLink = document.createElement('a');
-    timestampVideoLink.className = 'video-link';
-    timestampVideoLink.href = formatUrl(key, time)
-    timestampVideoLink.textContent = title;
+    const link = document.createElement("a");
+    link.className = "video-link";
+    link.href = formatUrl(key, time);
+    link.textContent = title;
 
-    timestampKeySpan.appendChild(timestampVideoLink);
-    // Create the timestamp-value span
-    const timestampValueSpan = document.createElement('span');
-    timestampValueSpan.className = 'timestamp-value';
-    timestampValueSpan.textContent = formatTime(time);
+    spanKey.appendChild(link);
 
-    // Append the key and value to the timestamp-left div
-    timestampLeftDiv.appendChild(timestampKeySpan);
-    timestampLeftDiv.appendChild(timestampValueSpan);
+    const progressStatus = document.createElement("div");
+    progressStatus.className = "progress-status";
 
-    const timestampRightDiv = document.createElement('div');
-    timestampRightDiv.className = 'timestamp-right';
+    const timeSpan = document.createElement("span");
+    timeSpan.className = "timestamp-value";
+    timeSpan.textContent = formatTime(time);
 
-    // Create the span element for the timestamp text
-    const timestampSpan = document.createElement('span');
-    timestampSpan.className = 'timestamp-video-link';
-    timestampSpan.textContent = formatUrl(key, time);
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar";
 
-    // Create the copy URL button
-    const copyButton = document.createElement('button');
-    copyButton.className = 'copy-url-btn';
-    copyButton.setAttribute('aria-label', 'copy-url-btn');
+    const progressCompleted = document.createElement("div");
+    progressCompleted.className = "progress-completed";
+    progressCompleted.style.width = `${done}%`
+    progressBar.appendChild(progressCompleted);
 
-    // Create the image for the copy button
-    const copyIcon = document.createElement('img');
-    copyIcon.className = 'copy-url-icon';
-    copyIcon.src = 'assets/copy.png';
+    const percent = document.createElement("span");
+    percent.className = "progress-percentage";
+    percent.textContent = done + "%";
 
-    // Append the image to the copy button
-    copyButton.appendChild(copyIcon);
-    copyButton.addEventListener('click', () => copyUrlToClipBoard(copyIcon, formatUrl(key, time)))
-    // Create the delete timestamp button
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'timestamp-delete-btn';
-    deleteButton.setAttribute('aria-label', 'delete-timestamp');
+    progressStatus.append(timeSpan, progressBar, percent);
 
-    // Create the image for the delete button
-    const deleteIcon = document.createElement('img');
-    deleteIcon.src = 'assets/delete.png';
-    deleteIcon.alt = '';
+    left.append(spanKey, progressStatus);
 
-    // Append the image to the delete button
-    deleteButton.appendChild(deleteIcon);
-    deleteButton.addEventListener('click', () => deleteTimestamp(key))
+    const right = document.createElement("div");
+    right.className = "timestamp-right";
 
-    // Append the span and buttons to the parent div
-    timestampRightDiv.appendChild(timestampSpan);
-    timestampRightDiv.appendChild(copyButton);
-    timestampRightDiv.appendChild(deleteButton);
+    const delBtn = document.createElement("button");
+    delBtn.className = "timestamp-delete-btn";
+    delBtn.setAttribute("aria-label", "delete-timestamp");
+    const delImg = document.createElement("img");
+    delImg.src = "assets/delete.png";
+    delBtn.appendChild(delImg);
+    delBtn.addEventListener('click', () => deleteTimestamp(key))
 
+    const videoLink = document.createElement("span");
+    videoLink.className = "timestamp-video-link";
 
-    // Append the left div and delete button to the main timestamp div
-    timestampDiv.appendChild(timestampLeftDiv);
-    timestampDiv.appendChild(timestampRightDiv);
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "copy-url-btn";
+    copyBtn.setAttribute("aria-label", "copy-url-btn");
+    const copyImg = document.createElement("img");
+    copyImg.className = "copy-url-icon";
+    copyImg.src = "assets/copy.png";
+    copyBtn.addEventListener('click', () => copyUrlToClipBoard(copyImg, formatUrl(key, time)))
+    copyBtn.appendChild(copyImg);
 
-    // Append the timestamp element to your desired parent in the DOM
-    container.appendChild(timestampDiv);
+    right.append(delBtn, videoLink, copyBtn);
+
+    timestamp.append(left, right);
+
+    container.appendChild(timestamp);
 
 }
 function deleteTimestamp(key) {
@@ -208,8 +219,7 @@ function fetchAll() {
     chrome.storage.local.get(null).then((result) => {
         allTimestamps = [];
         Object.keys(result).forEach((key) => {
-            const formattedTime = formatTime(parseFloat(result[key].time))
-            allTimestamps.push({ key: key, title: result[key].title, time: result[key].time })
+            allTimestamps.push({ key: key, title: result[key].title, time: result[key].time, done: result[key].done })
         }
         )
         refreshTimestamps()
@@ -218,17 +228,29 @@ function fetchAll() {
 }
 
 function refreshTimestamps() {
-    timestampsContainer.innerHTML = '';
-    // Render all timestamps
-    allTimestamps.forEach(({ key, title, time }) => {
-        createTimestamp(timestampsContainer, key, title, time);
-    });
+    timestampsContainer.innerHTML = ''
+    if (allTimestamps.length > 0) {
+        // Render all timestamps
+        allTimestamps.forEach(({ key, title, time, done }) => {
+            createTimestamp(timestampsContainer, key, title, time, done);
+        });
+    } else {
+        timestampsContainer.innerHTML =
+            `
+        <div class="fallback">
+        <div>
+          <img class="fallback-img" src="assets/fallback1.png" alt="fallback-img">
+        </div>
+        <p>No video captured</p>
+      </div>        
+        `
+    }
 }
 
 function updateTimestamps(response) {
     // removing the element if it already exist in the array to get the updated one
     allTimestamps = allTimestamps.filter(ts => ts.key !== response.key);
-    allTimestamps.push({ key: response.key, title: response.title, time: response.time });
+    allTimestamps.push({ key: response.key, title: response.title, time: response.time, done: response.done });
     refreshTimestamps();
 }
 
@@ -245,7 +267,7 @@ function addTimestamp() {
             })
         }
         else {
-            alert('please watch a video to capture', tabs[0].url)
+            alert('please watch a youtube video to capture', tabs[0].url)
         }
     })
 }
@@ -277,15 +299,13 @@ function setTitle(videoTitle, currentPlayback) {
             })
         }
         else {
-            currentPlayback.innerHTML = '<p class="no-playback">Hello welcome</p>'
+            currentPlayback.innerHTML =
+                `
+            <div class="no-playback">
+             <p>Welcome to ustamp</p>
+             <span>Save your last played time and continue where you left off</span>
+            </div>
+             `
         }
     })
 }
-
-
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        // Clear the flag when the popup is closed
-        chrome.storage.sync.set({ isPopupOpen: false });
-    }
-})

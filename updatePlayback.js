@@ -29,40 +29,43 @@ async function runAll(video, videoContainer) {
     let observer = new MutationObserver(() => {
         let vc = document.getElementsByTagName('video')[0].parentElement.parentElement
         if (vc.classList.contains("ad-showing")) {
-            // video.currentTime = 10000 // temp for testing should be removed
             console.log('showing ad....');
         }
         else {
-            console.log('not showing ad....', videoId);
-            // video.currentTime = 0 // temp for testing should be removed
+            // console.log('not showing ad....', videoId);
             observer.disconnect()
-            // get the video from storage 
-            chrome.storage.local.get([videoId]).then((result) => {
-                if (Object.keys(result).length === 0) {
-                    console.log('no records found', videoId, result);
-                    sendAutoCaptureMsg()
-                    return
+            chrome.storage.sync.get(['autoUpdate'], (result) => {
+                let autoUpdatePlayback = result.autoUpdate ?? true;
+                if (autoUpdatePlayback) {
+                    // get the video from storage 
+                    chrome.storage.local.get([videoId]).then((result) => {
+                        if (Object.keys(result).length === 0) {
+                            console.log('no records found', videoId, result);
+                            sendAutoCaptureMsg()
+                            return
+                        }
+                        else {
+                            console.log(Object.keys(result).length)
+                            let currentTimestamp = result[videoId].time
+                            // check if video is already loaded
+                            if (video.currentTime !== undefined) {
+                                setCurrentTime(video, currentTimestamp)
+                                console.log('video already loaded:');
+                            }
+                            else {
+                                // wait for loading the video meta data
+                                console.log('video not loaded yet', video.currentTime);
+                                video.onloadedmetadata = (event) => {
+                                    // update it's currentTime
+                                    console.log('Metadata loaded', video, video.currentTime);
+                                    setCurrentTime(video, currentTimestamp)
+                                    video.onloadedmetadata = null;
+                                };
+                            }
+                        }
+                        console.log('bye from update playback')
+                    })
                 }
-                else {
-                    console.log(Object.keys(result).length)
-                    let currentTimestamp = result[videoId].time
-                    // check if video is already loaded
-                    if (video.currentTime !== undefined) {
-                        setCurrentTime(video, currentTimestamp)
-                        console.log('video already loaded:');
-                    }
-                    else {
-                        // wait for loading the video meta data
-                        console.log('video not loaded yet', video.currentTime);
-                        video.onloadedmetadata = (event) => {
-                            // update it's currentTime
-                            console.log('Metadata loaded', video, video.currentTime);
-                            setCurrentTime(video, currentTimestamp)
-                            video.onloadedmetadata = null;
-                        };
-                    }
-                }
-                console.log('bye from update playback')
             })
         }
     })
