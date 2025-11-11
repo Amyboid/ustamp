@@ -1,0 +1,149 @@
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/Inter.ttf");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter;
+  scroll-behavior: smooth;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  background-color: hsl(0, 64%, 95%);
+}
+
+main {
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  width: 50vw;
+  height: auto;
+  height: 100vh;
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+}
+
+#support,
+#user-guide {
+  width: 100%;
+  height: 100vh;
+  padding: 20px;
+  scroll-snap-align: start;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.information {
+  padding: 20px;
+  padding-bottom: 10px;
+}
+
+.description {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(40deg, hsl(331, 81%, 53%), hsl(0, 97%, 80%), #fd6868);
+  border-radius: 10px;
+  position: relative;
+}
+
+.description p {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #4d4c4c;
+
+}
+
+.description img {
+  height: 100px;
+}
+
+#user-guide h2 {
+  margin: 15px 0 5px 0;
+  font-size: 1.3rem;
+}
+
+p {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  color: #605f5f;
+}
+
+#user-guide li {
+  list-style: none;
+  font-size: 0.9rem;
+  padding: 8px 20px;
+  color: #474747;
+  text-align: justify;
+}
+
+#support h2 {
+  margin: 0px 0 45px 0;
+  font-size: 1.5rem;
+}
+
+.support-desc {
+  /* border: 1px solid gray; */
+  /* padding-bottom: 20px; */
+  width: 100%;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
+}
+
+.support-desc p {
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  color: #474747;
+  position: absolute;
+  bottom: 0;
+}
+
+#support li {
+  list-style: none;
+  font-size: 1rem;
+  padding: 5px;
+  color: #474747;
+  text-align: center;
+}
+
+.shy-img {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shy-img img {
+  width: 250px;
+}
+
+.qr {
+  padding-top: 10px;
+  padding-left: 20px;
+}
+
+.qr img {
+  width: 100px;
+}

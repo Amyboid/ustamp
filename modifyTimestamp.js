@@ -57,10 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 `
       <div class="support">
         <img src="assets/support.png" alt="" />
-        <span><a href="">Show some support</a></span>
+        <span><a href="static/user_guide.html#support" target="_blank">Show some support</a></span>
       </div>
       <span>|</span>
-      <span><a href="">How to use this extension?</a></span>
+      <span><a href="static/user_guide.html#user-guide" target="_blank">How to use this extension?</a></span>
         `
         }
     });
