@@ -147,6 +147,7 @@ function createTimestamp(container, key, title, time, done) {
 
     const link = document.createElement("a");
     link.className = "video-link";
+    link.target = '_blank'
     link.href = formatUrl(key, time);
     link.textContent = title;
 

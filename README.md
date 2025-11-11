@@ -11,9 +11,9 @@ Experience YouTube without logging in and keep track of your progress
 <br>
 
 ## Features
- - Automatically update playback, if last played time is captured
- - Toggle <b>Auto capture</b> to capture time at 15s interval
- - Manage all saved video from popup window
+ - Automatically update playback
+ - Toggle <b>Auto capture</b> to capture time at 10s interval
+ - Manage all saved video from default popup window
 
 ## Some shots
 ![image](./demo/d1.png)
