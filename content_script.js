@@ -1,4 +1,4 @@
-console.log('Content script loaded')
+// console.log('Content script loaded')
 let video;
 let parentDiv;
 let videoContainer;
@@ -11,11 +11,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     title = getTitle()
     let videoId = videoContainer.baseURI.split('v=')[1].split('&')[0]
 
-    console.log('video from content script in first load: ', videoId);
+    //console.log('video from content script in first load: ', videoId);
 
     // checking for add timestamp instruction
     if (message.addTimestamp) {
-        console.log("video while normal capturing: ", videoContainer.baseURI.split('v=')[1]);
+        //console.log("video while normal capturing: ", videoContainer.baseURI.split('v=')[1]);
         // update or set new timestamp of a video
         chrome.storage.local.set({ [videoId]: { "title": title, "time": video.currentTime, "done": calculatePercentage(video.currentTime, video.duration) } }).then(() => {
             sendResponse({ key: videoId, title: title, time: video.currentTime, done: calculatePercentage(video.currentTime, video.duration) })
@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     // checking for auto capture instruction
     if (message.autoCapture) {
-        console.log('msg for ac: ', message.sender, "\nvideoId from container: ", videoContainer.baseURI.split('v=')[1], "\nvideoId from videoId: ", videoId, "\nvideo title:", title);
+        //console.log('msg for ac: ', message.sender, "\nvideoId from container: ", videoContainer.baseURI.split('v=')[1], "\nvideoId from videoId: ", videoId, "\nvideo title:", title);
         if (message.autoCapture === 'start') {
             autoCapture(videoId, message.tabId, true)
             sendResponse({ capturing: true })
@@ -54,14 +54,14 @@ function calculatePercentage(currentTime, duration) {
 }
 // let intervalIds = new Set();
 function autoCapture(videoId, tabId, start) {
-    console.log('\n-----\nvideoId passed to autocapture: ', videoId, "\nstart: ", start, "\n-----\n");
+   // console.log('\n-----\nvideoId passed to autocapture: ', videoId, "\nstart: ", start, "\n-----\n");
     if (start) {
         chrome.storage.sync.get(['autoCapturing'], (result) => {
             if (Object.keys(result).length > 0) {
                 let allCapturingVideos = result.autoCapturing
                 let previousVideoInTheTab = allCapturingVideos.find((video) => video.tabId === tabId)
                 if (previousVideoInTheTab) {
-                    console.log('previousInterval InervalId: ', previousVideoInTheTab.intervalId);
+                    //console.log('previousInterval InervalId: ', previousVideoInTheTab.intervalId);
                     clearInterval(previousVideoInTheTab.intervalId)
                 }
 
@@ -76,7 +76,7 @@ function autoCapture(videoId, tabId, start) {
                 let allCapturingVideos = result.autoCapturing
                 let previousVideoInTheTab = allCapturingVideos.find((video) => video.tabId === tabId)
                 if (previousVideoInTheTab) {
-                    console.log('previousInterval InervalId: ', previousVideoInTheTab.intervalId);
+                    //console.log('previousInterval InervalId: ', previousVideoInTheTab.intervalId);
                     clearInterval(previousVideoInTheTab.intervalId)
                 }
                 setCurrentlyAutoCapturingVideo(tabId, false, undefined)
@@ -96,7 +96,7 @@ function startInterval(videoId) {
                         updatedTime = Math.max(updatedTime, result[videoId].time)
                     }
                     chrome.storage.local.set({ [videoId]: { "title": title, "time": updatedTime, "done": calculatePercentage(video.currentTime, video.duration) } }).then(() => {
-                        console.log('\n---\ncaptured video info\n', "videoId: ", videoId, "\ntitle: ", title, "\currentTime: ", updatedTime, "intervalId: ", intervalId, "\n----\n");
+                        //console.log('\n---\ncaptured video info\n', "videoId: ", videoId, "\ntitle: ", title, "\currentTime: ", updatedTime, "intervalId: ", intervalId, "\n----\n");
                     });
                 })
             }
@@ -122,7 +122,7 @@ function setCurrentlyAutoCapturingVideo(tabId, add, intervalId) {
 function getTitle() {
     let titleTag = document.querySelector('head > title')
     if (titleTag) {
-        console.log('from else if cond', produceTitle(titleTag.innerText));
+       // console.log('from else if cond', produceTitle(titleTag.innerText));
         return produceTitle(titleTag.innerText)
     }
     return null
@@ -142,4 +142,4 @@ function produceTitle(text) {
     }
 }
 
-console.log('bye from content script');
+//console.log('bye from content script');
